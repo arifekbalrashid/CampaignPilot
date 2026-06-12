@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     """All app settings loaded from environment / .env file."""
 
     # Database
-    database_url: str = "sqlite+aiosqlite:///./campaignpilot.db"
+    database_url: str = "mysql+asyncmy://root:password@localhost:3306/campaignpilot"
 
     # AI
     gemini_api_key: str = ""
