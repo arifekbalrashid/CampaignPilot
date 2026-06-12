@@ -12,6 +12,7 @@ import LoadingSpinner from './components/LoadingSpinner';
 import './index.css';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+console.log("Vercel thinks the Client ID is:", GOOGLE_CLIENT_ID);
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
