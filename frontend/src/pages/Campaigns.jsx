@@ -314,9 +314,9 @@ export default function Campaigns() {
                   </>
                 ) : (
                   <>
-                    <button className="btn-secondary" style={{ flex: 1, color: 'var(--rose)', borderColor: 'rgba(239, 68, 68, 0.2)' }} onClick={() => handleDelete(selectedCampaign.id)}>🗑️ Delete</button>
-                    <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setIsEditing(true)}>✏️ Edit Plan</button>
-                    <button className="btn-primary" style={{ flex: 2 }} onClick={() => handleLaunch(selectedCampaign.id)}>⚡ Launch Campaign</button>
+                    <button className="btn-secondary" style={{ flex: 1, color: 'var(--rose)', borderColor: 'rgba(239, 68, 68, 0.2)' }} onClick={() => handleDelete(selectedCampaign.id)}>Delete</button>
+                    <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setIsEditing(true)}>Edit Plan</button>
+                    <button className="btn-primary" style={{ flex: 2 }} onClick={() => handleLaunch(selectedCampaign.id)}>Launch Campaign</button>
                   </>
                 )}
               </div>
