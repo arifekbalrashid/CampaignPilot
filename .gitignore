@@ -1,23 +1,42 @@
 # Python
-backend/venv/
-backend/__pycache__/
-backend/*.db
-backend/.env
 
-channel-service/venv/
-channel-service/__pycache__/
-channel-service/.env
+venv/
+.venv/
+env/
 
-# Node
-frontend/node_modules/
-frontend/dist/
-frontend/.env
+__pycache__/
+*.py[cod]
+*$py.class
+
+*.db
+*.sqlite3
+
+.env
+.env.*
+
+# Node.js
+
+node_modules/
+dist/
+build/
+
+# IDEs
+
+.vscode/
+.idea/
 
 # macOS
+
 .DS_Store
 
-# VSCode
-.vscode/
-
 # Logs
+
 *.log
+
+# Cache
+
+coverage/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
