@@ -225,18 +225,32 @@ async def import_customers(
     skipped = 0
     errors = []
 
+    mapped_rows = []
+    emails_to_fetch = set()
+
     for idx, row in enumerate(rows, start=2):
         mapped = map_customer_row(row)
         if not mapped:
             skipped += 1
             errors.append(f"Row {idx}: Missing required fields (name, email)")
             continue
+        mapped_rows.append(mapped)
+        emails_to_fetch.add(mapped["email"])
 
-        # Check for duplicate email
-        stmt = select(Customer).where(Customer.email == mapped["email"])
-        result = await db.execute(stmt)
-        existing = result.scalar_one_or_none()
+    # Pre-fetch existing customers to avoid N+1 queries
+    existing_customers = {}
+    if emails_to_fetch:
+        emails_list = list(emails_to_fetch)
+        chunk_size = 1000
+        for i in range(0, len(emails_list), chunk_size):
+            chunk = emails_list[i:i + chunk_size]
+            stmt = select(Customer).where(Customer.email.in_(chunk))
+            result = await db.execute(stmt)
+            for customer in result.scalars().all():
+                existing_customers[customer.email] = customer
 
+    for mapped in mapped_rows:
+        existing = existing_customers.get(mapped["email"])
         if existing:
             # Update existing customer
             for key, value in mapped.items():
@@ -287,12 +301,8 @@ async def import_orders(
     if not rows:
         raise HTTPException(400, "File is empty or has no data rows")
 
-    # Build email → customer_id map
-    stmt = select(Customer.id, Customer.email)
-    result = await db.execute(stmt)
-    email_map = {email: cid for cid, email in result.all()}
-
-    imported = 0
+    mapped_orders = []
+    emails_to_fetch = set()
     skipped = 0
     errors = []
 
@@ -302,7 +312,24 @@ async def import_orders(
             skipped += 1
             errors.append(f"Row {idx}: Missing required fields (customer_email, product, amount)")
             continue
+        mapped_orders.append((idx, mapped))
+        emails_to_fetch.add(mapped["customer_email"])
 
+    # Build email → customer_id map only for required emails
+    email_map = {}
+    if emails_to_fetch:
+        emails_list = list(emails_to_fetch)
+        chunk_size = 1000
+        for i in range(0, len(emails_list), chunk_size):
+            chunk = emails_list[i:i + chunk_size]
+            stmt = select(Customer.id, Customer.email).where(Customer.email.in_(chunk))
+            result = await db.execute(stmt)
+            for cid, email in result.all():
+                email_map[email] = cid
+
+    imported = 0
+
+    for idx, mapped in mapped_orders:
         customer_id = email_map.get(mapped["customer_email"])
         if not customer_id:
             skipped += 1
