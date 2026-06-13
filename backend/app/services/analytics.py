@@ -99,8 +99,8 @@ class AnalyticsService:
 
         return perf_data
 
-    async def get_suggestions(self) -> list[dict]:
-        """Get AI-generated campaign suggestions."""
+    async def get_suggestion_context(self) -> tuple[dict, list[str]]:
+        """Get customer and campaign context for AI suggestions."""
         # Get customer stats
         stmt = select(Customer)
         result = await self.db.execute(stmt)
@@ -123,5 +123,4 @@ class AnalyticsService:
         recent = result.scalars().all()
         recent_names = [c.name for c in recent]
 
-        result = await campaign_ai.suggest_campaigns(customer_context, recent_names)
-        return [s.model_dump() for s in result.suggestions]
+        return customer_context, recent_names
